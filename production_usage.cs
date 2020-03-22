@@ -16,9 +16,7 @@ public void Main(string argument, UpdateType updateSource)
 	var blocks = new List<IMyProductionBlock>();
 	GridTerminalSystem.GetBlocksOfType(blocks, blockType => blockType is IMyProductionBlock);
 
-	blocks = blocks.OrderBy(b => b.DisplayNameText).ToList();
-
-	foreach (var block in blocks)
+	foreach (var block in blocks.OrderBy(b => b.DisplayNameText))
 	{
 		sb.Append(block.DisplayNameText);
 		sb.Append(": ");
