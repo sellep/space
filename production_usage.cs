@@ -1,35 +1,40 @@
-//https://bloc97.github.io/SpaceEngineersModAPIDocs/html/8fcbd568-8be9-c0d3-1381-71f4076f2b0c.htm
-
 private IMyTextPanel m_panel;
 
 public Program()
 {
-	Runtime.UpdateFrequency = UpdateFrequency.Update10;
-	
-	m_panel = GridTerminalSystem.GetBlockWithName("Text Pascal") as IMyTextPanel;
+    Runtime.UpdateFrequency = UpdateFrequency.Update10;
+
+    m_panel = GridTerminalSystem.GetBlockWithName("Text Pascal") as IMyTextPanel;
 }
 
 public void Main(string argument, UpdateType updateSource)
 {
-	var sb = new StringBuilder();
+    var sb = new StringBuilder();
 
-	var blocks = new List<IMyProductionBlock>();
-	GridTerminalSystem.GetBlocksOfType(blocks, blockType => blockType is IMyProductionBlock);
+    var blocks = new List<IMyProductionBlock>();
+    var items = new List<MyProductionItem>();
 
-	foreach (var block in blocks.OrderBy(b => b.DisplayNameText))
-	{
-		sb.Append(block.DisplayNameText);
-		sb.Append(": ");
-		
-		if (block.IsQueueEmpty)
-		{
-			sb.AppendLine("NOT WORKING!!! >.<");
-		}
-		else
-		{
-			sb.AppendLine("WORKING :)");
-		}
-	}
+    GridTerminalSystem.GetBlocksOfType(blocks, blockType => blockType is IMyProductionBlock);
 
-	m_panel.WritePublicText(sb.ToString());
+    foreach (var block in blocks.OrderBy(b => b.DisplayNameText))
+    {
+        sb.Append(block.DisplayNameText);
+
+        if (block.IsQueueEmpty)
+        {
+            sb.AppendLine(": -");
+        }
+        else
+        {
+            items.Clear();
+
+            block.GetQueue(items);
+            var item = items.First();
+
+            sb.Append(": ");
+            sb.AppendLine(item.BlueprintId.SubtypeName);
+        }
+    }
+
+    m_panel.WritePublicText(sb.ToString());
 }
