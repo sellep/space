@@ -1,11 +1,16 @@
 private IMyInventory m_cargoInventory;
+private IMyTextPanel m_panel;
+
+private List<string> m_logs = new List<string>();
 
 public Program()
 {
-    Runtime.UpdateFrequency = UpdateFrequency.Update10;
+    Runtime.UpdateFrequency = UpdateFrequency.Update100;
 
     var cargo = (IMyCargoContainer)GridTerminalSystem.GetBlockWithName("LargeCargoContainer");
     m_cargoInventory = cargo.GetInventory(0);
+
+    m_panel = (IMyTextPanel)GridTerminalSystem.GetBlockWithName("Text Pascal");
 }
 
 public void Main(string argument, UpdateType updateSource)
@@ -30,14 +35,22 @@ public void Main(string argument, UpdateType updateSource)
 
             if (m_cargoInventory.TransferItemFrom(inventory, item, item.Amount))
             {
-                Echo(assembler.DisplayNameText + ": " + GetItemName(item.Type) + " (" + item.Amount + ")");
+                m_logs.Add(assembler.DisplayNameText + ": " + GetItemName(item.Type) + " (" + item.Amount + ")");
             }
-            //else
-            //{
-            //    Echo("transfer failed from " + assembler.DisplayNameText + ", " + item.Type.ToString());
-            //}
         }
     }
+
+    Print();
+}
+
+private void Print()
+{
+    while (m_logs.Count > 10)
+    {
+        m_logs.RemoveAt(0);
+    }
+
+    m_panel.WritePublicText(string.Join(Environment.NewLine, m_logs));
 }
 
 private static string GetItemName(MyItemType type)
